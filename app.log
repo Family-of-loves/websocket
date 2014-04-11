@@ -1,0 +1,18 @@
+
+DEBUG: Running node-supervisor with
+DEBUG:   program './app.js'
+DEBUG:   --watch '.'
+DEBUG:   --ignore 'undefined'
+DEBUG:   --extensions 'node|js'
+DEBUG:   --exec 'node'
+
+DEBUG: Starting child process with 'node ./app.js'
+DEBUG: Watching directory '/home/websocks/apps/runman' for changes.
+connect.multipart() will be removed in connect 3.0
+visit https://github.com/senchalabs/connect/wiki/Connect-3.0 for alternatives
+connect.limit() will be removed in connect 3.0
+info: socket.io started
+Express server listening on port 3000
+info: FlashPolicyFileServer received an error event:
+listen EADDRINUSE
+DEBUG: Sending SIGINT to child...

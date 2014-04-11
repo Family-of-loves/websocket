@@ -1,0 +1,23 @@
+extends layout
+
+block content
+	h2 채팅방
+	form(action='/enter', method='POST')
+		label(for='username')닉네임
+		input(type='hidden', id='sessionVal', value='#{sessionusername}')
+		input(type='text', name='username', id='username', placeholder='닉네임을 입력 해 주세요')
+		input(type='submit', value='참가')
+	
+	script(type='text/javascript').
+		$('document').ready(function(){
+			if($('#sessionVal').val() !== 'undefined'){
+				location.href="/enter";
+			}				
+			$('form').submit(function(e){
+				if($.trim($('#username').val()) === ''){
+					alert('닉네임을 입력 해 주세요~!');
+					return false;
+				}
+			});
+		});
+		
