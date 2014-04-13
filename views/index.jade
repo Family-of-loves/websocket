@@ -1,13 +1,77 @@
 extends layout
 
 block content
-	h2 채팅방
-	form(action='/enter', method='POST')
-		label(for='username')닉네임
-		input(type='hidden', id='sessionVal', value='#{sessionusername}')
-		input(type='text', name='username', id='username', placeholder='닉네임을 입력 해 주세요')
-		input(type='submit', value='참가')
-	
+	div.masthead
+		.container
+			.row
+				.col-xs-12.col-sm-7
+					h2 A private group game
+					p 우리끼리 하는 게임, 게임이 더 쉬워진다.
+					div(style="margin-top:47%;")
+						a(href="#", onclick="alert('준비중입니다.')")
+							img(src="https://developer.android.com/images/brand/en_app_rgb_wo_60.png")
+				.col-xs-12.col-sm-5
+					h2 10초만에 방만들기
+					form(action='/enter', method='POST')
+						input.form-control(type='hidden', id='sessionVal', value='#{sessionUsername}')
+						.form-group
+							label(for="username") 방 아이디
+							input.form-control(type='text', name='username', id='username', placeholder='아이디를 입력해주세요.')
+						.form-group
+							label(for="groupname") 그룹 이름
+							input.form-control(type='text', name='groupname', id='groupname', placeholder='관리자 그룹 이름을 입력해주세요.')
+						.form-group
+							label(for="grouppw") 그룹 비밀번호
+							input.form-control(type='password', name='grouppw', id='grouppw', placeholder='관리자 비밀번호를 입력해주세요')
+							small.help-block 방장 전용 비밀번호입니다. 참가자에게 노출을 삼가하세요.
+						input.btn.btn-lg.btn-success(type='submit', value='방 만들기')
+	#about.container
+		.row
+			.col-xs-12.border-bottom
+				h2.text-center About
+		.row(style="margin-bottom:60px;")
+			.col-xs-12.col-sm-6
+				h4.text-center
+					span.glyphicon.glyphicon-lock.intro-icon-1
+					|Private group game
+				p 절대 개방형 게임이 아닙니다. 학교 축제, 동아리 친목활동 등 각 그룹에서만 한정되게 사용하세요. 그룹과 관련없는 사용자가 접속하게 되면 게임이 원활히 진행되지 않습니다.
+			.col-xs-12.col-sm-6
+				h4.text-center 
+					span.glyphicon.glyphicon-map-marker.intro-icon-2 
+					|Just Run, RunningMan
+				p 스마트폰에 내장되어 있는 GPS 좌표를 통하여 지정된 영역안에 상대방의 위치를 탐색하기 위해 이동합니다. 또한 상대방을 만나면 게임을 통하여 경기에 탈락시킬 수 있습니다.
+		.row(style="margin-bottom:60px;")
+			.col-xs-12.col-sm-6
+				h4.text-center 
+					span.glyphicon.glyphicon-phone.intro-icon-3 
+					|Smartphone is Utility
+				p 스마트폰은 팀원의 위치확인과 상대방이 반경 10M 내에 접근하였을 때 사용하세요. 아! 걱정하지마세요. 상대방이 접근하게 되면 스마트폰 진동을 통해 얼마든지 알려드립니다.
+			.col-xs-12.col-sm-6
+				h4.text-center 
+					span.glyphicon.glyphicon-tower.intro-icon-4
+					|또다른 재미, 가위바위보
+				p 게임시작 전 가위바위보의 패를 선택하여, 상대팀을 만나면 각각 자신이 가지고 있는 패를 이용해 게임을 진행합니다. 같은 팀 끼리 가위바위보 분배를 잘 하면 상대팀을 전멸시킬 수 있습니다.
+	#howto.container
+		.row
+			.col-xs-12.border-bottom
+				h2.text-center How to use?
+		.row
+			.col-xs-12.col-sm-4
+				h4.text-center
+					span.glyphicon.glyphicon-cloud.intro-icon-1
+					방을 생성하세요.
+				p 위 입력 폼에 필요한 항목을 채우면, 그 즉시 방을 생성할 수 있습니다.
+			.col-xs-12.col-sm-4
+				h4.text-center 
+					span.glyphicon.glyphicon-bullhorn.intro-icon-2
+					내가 만든 방을 전달하세요.
+				p 친구들에게 내가 만든 방을 문자 메시지나 SNS를 통해 알리고, 참가하게 하세요.
+			.col-xs-12.col-sm-4
+				h4.text-center 
+					span.glyphicon.glyphicon-play-circle.intro-icon-3
+					함께 즐기세요!
+				p 방장도 게임에 참가할 수 있습니다. 하지만 관리자페이지를 통하여 상대팀을 확인하지는 마세요.
+		
 	script(type='text/javascript').
 		$('document').ready(function(){
 			if($('#sessionVal').val() !== 'undefined'){

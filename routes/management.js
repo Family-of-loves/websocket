@@ -44,7 +44,6 @@ var management = module.exports = {
 			
 			if(!this.hasAttendant(rooms[0].attendants, user)){
 				rooms[0].attendants.push(user);
-//				console.log(rooms[0]);
 			}
 		}
 		, hasAttendant: function(attendants, user){

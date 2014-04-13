@@ -38,6 +38,9 @@ module.exports = function(server){
 		var joinedRoom = null;
 		
 		socket.on('join', function(data){
+			
+			socket.set('username', data.username);
+			
 			if( management.hasRoom(data.roomname)){
 				joinedRoom = data.roomname;
 				
@@ -66,9 +69,6 @@ module.exports = function(server){
 			}
 		});
 		
-		socket.on('disconnect', function(data){
-
-		});
 		socket.on('leave', function(data){
 			if(joinedRoom){
 				management.leaveRoom(joinedRoom, data.username);
@@ -76,9 +76,22 @@ module.exports = function(server){
 				socket.leave(joinedRoom);
 			}
 		});
+		socket.on('disconnect', function(){
+			var disconnUser = null;
+			
+			socket.get('username', function(err,data){
+				disconnUser = data;
+			});
+			
+			if(joinedRoom){
+				management.leaveRoom(joinedRoom, disconnUser);
+				socket.broadcast.to(joinedRoom).emit('leaved', {username : disconnUser});
+				socket.leave(joinedRoom);
+			}
+		});
 		
 		socket.on('tryEstablished', function(data){
-			socket.broadcast.emit("data-changed", data);
+			socket.broadcast.emit("disconnUser", data);
 		});
 	});
 }

@@ -2,9 +2,40 @@ doctype html
 html
   head
     title= title
-    link(rel='stylesheet', href='/stylesheets/style.css')
+    link(rel='stylesheet', href='/css/bootstrap.min.css')
+    link(rel='stylesheet', href='/css/style.css')
+    script(type='text/javascript', src='/socket.io/socket.io.js')
     script(type='text/javascript', src='//code.jquery.com/jquery-1.11.0.min.js')
     script(type='text/javascript', src='//code.jquery.com/jquery-migrate-1.2.1.min.js')
-    script(type='text/javascript', src='/socket.io/socket.io.js')
+    script(type='text/javascript', src='/js/bootstrap.min.js')
   body
-    block content
+    header#main-header.navbar.navbar-static-top
+      .container
+        h1.navbar-brand We are the RunningMan
+        div.pull-right.top-nav
+          - if(username)
+            .dropdown
+              button.btn.btn-default.dropdown-toggle(type="button", data-toggle="dropdown")
+                span.glyphicon.glyphicon-user 
+                &nbsp;
+                b #{username}
+                님!&nbsp;
+                span.caret
+              ul.dropdown-menu(role="menu")
+                li
+                  a(href="#") Logout
+          - else 
+            nav.collapse.navbar-collapse(role="navigation")
+              ul.nav.navbar-nav.navbar-right
+                li 
+                  a(href="#about") About
+                li 
+                  a(href="#howto") How to use?
+          
+    section#main-section
+      block content
+    footer#main-footer
+      .copyright
+        h5.text-center Copyright &copy; 사랑의 가족 
+          small on Kumoh National Institute of Technology
+          , Since 2014.

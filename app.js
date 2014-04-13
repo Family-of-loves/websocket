@@ -112,7 +112,6 @@ app.get('/join/:id', function(req,res){
 			errArg : req.param.id
 		});
 	}
-	
 });
 
 //app.get('/users', user.list);

@@ -8,6 +8,6 @@ exports.index = function(req, res){
   
   res.render('index', { 
   	title: 'Express',
-  	sessionNickname: req.session.nickname
+  	sessionUsername: req.session.username
   });
 };
