@@ -1,0 +1,12 @@
+extends layout
+
+block content
+	input(type='hidden', id='destroyRoom', value='#{roomid}')
+	input(type='hidden', id='destroyGroup', value='#{groupname}')
+	script(type='text/javascript').
+		$('html').hide();
+		var room = io.connect('/');
+			room.emit('destroy', {roomid : $('#destroyRoom').val(), groupname : $('#destroyGroup').val()});
+			room.on('destroySucc', function(data){
+				location.href = '/';
+			});

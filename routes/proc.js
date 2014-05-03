@@ -37,38 +37,50 @@ module.exports = function(server){
 	.on('connection', function(socket){
 		var joinedRoom = null;
 		
-		socket.on('join', function(data){
-			
+		socket.on('join', function(data){			
 			socket.set('username', data.username);
-			
-			if( management.hasRoom(data.roomname)){
-				joinedRoom = data.roomname;
+
+			if( management.hasRoom(data.roomid) ){
+				joinedRoom = data.roomid;
 				
 				socket.join(joinedRoom);
-				
 				socket.emit('joined', {
 					isSuccess : true
-					, username : data.username
-					, joined_status : true
+				,	data : data
 				});
-				
 				socket.broadcast.to(joinedRoom).emit('joined', {
 					isSuccess : true
-					, username : data.username
+				,	data : data
 				});
 				management.joinRoom(joinedRoom, data.username);
-				
 			} else {
-				socket.emit('joined', {isSuccess:false});
+				/* 
+					방이 없는경우 
+					(서버가 재시작된다면 이 방은 없어져야함)
+					이때 Private 통신을 통하여 로그아웃 시킴.
+				*/
 			}
+		});
+		
+		socket.on('joinUser', function(data){
+			var isSuccess = true
+			,	username = data.username;
+			
+			if(username && username.trim() !== ''){
+				if(!management.hasUser(username)){
+					management.addUser(username);
+					isSuccess = true;
+				}
+			}
+				
 		});
 		
 		socket.on('message', function(data){
 			if(joinedRoom){
-				socket.broadcast.to(joinedRoom).json.send(data);
+				socket.broadcast.to(joinedRoom).emit('message', {isSuccess : true ,data : data});
 			}
 		});
-		
+
 		socket.on('leave', function(data){
 			if(joinedRoom){
 				management.leaveRoom(joinedRoom, data.username);
@@ -88,6 +100,11 @@ module.exports = function(server){
 				socket.broadcast.to(joinedRoom).emit('leaved', {username : disconnUser});
 				socket.leave(joinedRoom);
 			}
+		});
+		socket.on('destroy', function(data){
+			management.removeRoom(data.roomid);
+			management.removeUser(data.groupname);
+			socket.emit('destroySucc', data);
 		});
 		
 		socket.on('tryEstablished', function(data){

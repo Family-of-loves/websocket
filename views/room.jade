@@ -2,55 +2,122 @@ extends layout
 
 block content
 	- if(!isSuccess)
+		<!-- Modal -->
+		#inputRoomPW.modal.fade(tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true")
+			.modal-dialog
+				.modal-content
+					.modal-header
+						h3 Oops!
+						| 관리자 모드로 들어가기 위한 비밀번호를 입력해주세요.
+					.modal-body
+						form(action='/join/', method='POST')
+							.form-group
+								label(for="roompw") 방 비밀번호
+								input.form-control(type='password', name='roompw', id='roompw', placeholder='관리 목적의 방 비밀번호를 입력해주세요')
+								input(type="hidden", name="roomid", id="roomid" value="#{roomid}")
+							input.btn.btn-lg.btn-danger(type='submit', value='확인')
 		script.
-			alert('방에 입장 할 수 없습니다.');
-			history.go(-1);
+			$(document).ready(function(){
+				$('#inputRoomPW').insertAfter($("#main-footer"));
+				$('#inputRoomPW').modal({
+					show: true,
+					backdrop: 'static'
+				});
+			});
 	- else
-		h3 방제 :
-			span#roomname= roomname 
-			input#leave(type='button', value='나가기')
-		
-		#chatWindow
-		div#attendantsWindow
-			p 참가자
-			ul#attendants
-				each attendant in attendants
-					li(id='attendant-'+attendant)= attendant
-		form
-			span#myName #{username}
-			input(type='text')#message
-			input(type='submit', value='보내기')
-			
-			
+	input#roomid(type="hidden", value="#{roomid}")
+	input#groupname(type="hidden", value="#{groupname}")
+	.container.game-container
+		.row
+			.col-xs-12.game-mapview
+				.inner
+					div
+						img.spacer_full(src="/img/spacer_16_9.png")
+					div.game-mapview-title(data-is-mobile="false")
+						참가자의 모든 위치
+					div(style="position:absolute; top:0;right:0;left:0;bottom:0;z-index:1;")
+						div#map_canvas(style="width:100%; height:100%;")
+					
+		.row
+			.col-xs-12.col-sm-6.game-activity
+				.inner
+					#activitys.activity-window
+					form#notifySender.row.activity-form
+						div.col-xs-9.form-group
+							input(type='text' placeholder="공지사항을 전달하세요.")#message.form-control
+						div.col-xs-3.form-group
+							input(type='submit', value='보내기').btn.btn-success
+			.col-xs-12.col-sm-3.game-teaminfo
+				.inner
+					p 블루팀
+					ul#blueTeam
+						each attendant in attendants
+							li(id='blue-'+attendant)= attendant
+			.col-xs-12.col-sm-3.game-teaminfo
+				.inner
+					p 레드팀
+					ul#redTeam
+						each attendant in attendants
+							li(id='red-'+attendant)= attendant
+	- if(isSuccess)
+		script(type='text/javascript', src='//maps.googleapis.com/maps/api/js?key=AIzaSyB0OkEvPhBQziBq_I8ry-Hs_c2WtF4oRew&sensor=false')
 		script(type='text/javascript').
+			var latitude = 0;
+			var longitude = 0;
+			var mapOption = {};
+			var map = {};
+			
+			window.onload = function() {
+				navigator.geolocation.getCurrentPosition(function(position) {
+					latitude = position.coords.latitude;
+					longitude = position.coords.longitude;
+					
+					mapOptions = {
+						center: new google.maps.LatLng(latitude, longitude),
+						zoom: 13,
+						mapTypeId: google.maps.MapTypeId.ROADMAP
+					};
+					
+					map = new google.maps.Map(document.getElementById("map_canvas"),mapOptions);
+				});
+			};
+			function add_marker(playerName,latitude, longitude){
+				var marker = new google.maps.Marker({
+					position: new google.maps.LatLng(latitude, longitude),
+					title: playerName,
+					map : map,
+					clickable: true,
+					flat: true
+				});
+				marker.setMap(map);
+			}
+			
+			setTimeout("add_marker(35.856496, 128.553281)", 3000);
+			
 			$('document').ready(function(){
 				var room = io.connect('/');
-				var chatWindow = $('#chatWindow');
+				var activitys = $('#activitys');
 				var messageBox = $('#message');
-				var myName = $('#myName').text();
-				var attendants = $('#attendants');
+				var groupname = $('#groupname').val();
+				var blueTeam = $('#blueTeam');
+				var manager = "관리자"+Math.floor(Math.random() * 100) + 1;;
 				
 				function showMsg(msg){
-					chatWindow.append($('<p>').text(msg));
-					chatWindow.scrollTop(chatWindow.height());
+					activitys.append($('<p>').text(msg));
+					activitys.scrollTop(activitys.height());
 				}
 				
-				
-				$('form').submit(function(e){
+				$('#notifySender').submit(function(e){
 					e.preventDefault();
 					var msg = messageBox.val();
 					
 					if($.trim(msg) !== ''){
-						showMsg( myName + ' : ' + msg);
-						room.json.send({username: myName, msg:msg});
+						showMsg( manager + ' : ' + msg);
+						room.json.send({username: manager, msg:msg});
 						messageBox.val('')	
 					}
 				});
 				
-				$('#leave').click(function(){
-					room.emit('leave', {username : myName});
-					location.href = '/enter';
-				});
 				
 				/*
 					Socket Method define
@@ -58,27 +125,41 @@ block content
 				
 				room.on('connect', function(){
 					room.emit('join', 
-						{roomname : $('#roomname').text(), username: myName});
+						{
+							roomid : $('#roomid').val(),
+							username: manager,
+							team: 2
+						}
+					);
 				});
 				
 				room.on('joined', function(data){
 					if(data.isSuccess){
+						data = data.data;
 						showMsg(data.username + ' 님 입장!');
-						attendants.append($('<li>')
-							.attr('id', 'attendant-' + data.username)
-							.text(data.username));
+						console.log(data);
+						if(data.team == 0){
+							blueTeam.append($('<li>')
+								.attr('id', 'blue-' + data.username)
+								.text(data.username));
+						} else if(data.team == 1){
+							redTeam.append($('<li>')
+								.attr('id', 'red-' + data.username)
+								.text(data.username));							
+						} else {
+							//do stuff your plan
+						}
 					}
 				});
 				
 				room.on('message', function(data){
-					showMsg( data.username + ' : ' + data.msg);
+					console.log(data);
+					if(data.isSuccess){
+						data = data.data;
+						showMsg( data.username + ' : ' + data.latitude + ' / ' + data.longitude);
+						add_marker(data.username, data.latitude, data.longitude);
+					}
+					
 				});
 				
-				room.on('leaved', function(data){
-					showMsg( data.username + ' 님 퇴장!');
-					$('#attendant-' + data.username).remove();
-				});
 			});
-			
-						
-			

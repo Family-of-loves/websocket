@@ -1,0 +1,24 @@
+extends layout
+
+block content
+	- if(isSuccess)
+		h2 채팅방 목록
+		p #{username} 님 환영 합니다~
+		p 원하시는 채팅방이 없으면 방을 만드세요.
+		form(action='./makeroom', method='POST')
+			label(for='roomname')
+			input(type='text', name='roomname', id='roomname')
+			input(type='submit', value='생성')
+		ul
+			each room in roomlist
+				li= room
+					input(type='button', value='입장', onclick='location.href=\'/join/' +room+ '\'')
+	- else
+		- if(username === '')
+			script(type='text/javascript').
+				alert('잘못 된 닉네임 입니다.');
+				history.go(-1);
+		- else 
+			script(type='text/javascript').
+				alert('사용 중인 닉네임 입니다.');
+				history.go(-1);

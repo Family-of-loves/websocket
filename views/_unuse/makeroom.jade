@@ -1,0 +1,16 @@
+extends layout
+
+block content
+	- if(isSuccess)
+		script.
+			alert('방이 만들어 졌어요');
+			location.href = '/join/#{roomname}';
+			
+	- else if( roomname === '')
+		script.
+			alert('방을 만들지 못했어요');
+			history.go(-1);
+	- else 
+		script.
+			alert('이미 존재하는 방이에요');
+			history.go(-1);

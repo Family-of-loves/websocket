@@ -1,6 +1,8 @@
 /*
 	Well-known Markup elements
 */
+html { height: 100% }
+body { height: 100%; margin: 0; padding: 0 }
 body { background: #f9f9f9; color:#555; font: 14px "Lucida Grande", Helvetica, Arial, sans-serif;line-height: 160%; }
 p { margin: 0; }
 label {font-weight: 300;}
@@ -9,13 +11,13 @@ small {color:inherit}
 /*
 	Inherit Bootstrap Classes
 */
-.container{max-width:840px;}
+.container{max-width:940px;}
 .navbar-brand{ margin:0; border-bottom:#e0e0e0; }
 .navbar .container h1,
 .navbar .container .top-user-info {padding:15px 0; line-height:20px;}
-.navbar .container .top-user-info {padding:8px 0;}
-.help-block{color:inherit}
+.navbar .container .pull-right.top-nav {padding:8px 0;}
 .row [class^="col-"].border-bottom {margin-bottom:22px;}
+.help-block{color:inherit}
 
 /*
 	Custom ID & Classes
@@ -23,6 +25,7 @@ small {color:inherit}
 
 /* Global use */
 .border-bottom{ border-bottom:1px solid #ddd; padding-bottom:14px;}
+.spacer_full { width:100%; height:auto; }
 
 /* Header */
 #main-header { position:relative; background:#FFF;  box-shadow:0px 1px 4px rgba(0,0,0,.34); }
@@ -30,11 +33,29 @@ small {color:inherit}
 
 /* Section */
 #main-section{ position:relative; z-index: 0; }
+.play-store-link{margin-top:47%;}
 [class*="intro-icon-"]{ display:block; font-size:5em; padding-bottom:40px; }
 .intro-icon-1{ color:#4b89dc }
 .intro-icon-2{ color:#8cc051 }
 .intro-icon-3{ color:#db4453 }
 .intro-icon-4{ color:#967bdc }
 
+.game-container .row{margin:17px 0;}
+.game-container .row:first-child {margin-top:0;}
+.game-container .inner{ position:relative; padding:4px; background:#FFF; border:1px solid #e0e0e0; border-radius:8px; }
+.game-activity .inner,
+.game-teaminfo .inner {height:400px;}
+.game-mapview-title {position: absolute;top:20px;left:30%;right:30%; padding:8px; background: rgba(255,206,85,.85); color:#FFF; text-shadow:1px 1px 2px rgba(0,0,0,.7); font-size:1.3em; text-align: center; z-index:10;}
+.game-activity .activity-window { position:absolute; top:0;bottom:60px; left:5px; right:5px; overflow-y: scroll; padding:4px;}
+.game-activity .activity-form{ position:absolute; bottom:0;left:0;right:0;margin:0; padding-top:10px; border-top:1px solid #e0e0e0; background:#f0f0f0}
+
 /* Footer */
 .copyright{margin-top:40px;;padding:20px 0; background: #404040; color:#FFF;}
+
+@media all and (max-width:480px){
+	[data-is-mobile="false"] {display:none;}
+	
+	#main-header .navbar-brand{text-align: center;}
+	.masthead{padding:0 0 20px;}
+	.play-store-link{margin-top:10px; margin-bottom:20px}
+}

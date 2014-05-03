@@ -41,7 +41,7 @@ if ('development' == app.get('env')) {
 }
 
 app.get('/', routes.index);
-
+/*
 app.post('/enter', function(req, res){
 	var isSuccess = false
 		, username = req.body.username;
@@ -77,35 +77,72 @@ app.get('/enter', function(req, res){
 
 app.post('/makeroom', function(req, res){
 	var isSuccess = false
-		, roomname = req.body.roomname;
+		, roomid = req.body.roomid;
 		
-	if(roomname && roomname.trim() !== ''){
-		if(!management.hasRoom(roomname)){
-			management.addRoom(roomname);
+	if(roomid && roomid.trim() !== ''){
+		if(!management.hasRoom(roomid)){
+			management.addRoom(roomid);
 			isSuccess = true;
 		}
 	}
 	res.render('makeroom', {
 		isSuccess : isSuccess
-		, roomname : roomname
+		, roomid : roomid
+	});
+});
+*/
+
+app.post('/make', function(req,res){
+	var isSuccess = false
+	,	roomid = req.body.roomid
+	,	roompw = req.body.roompw
+	,	groupname = req.body.groupname
+	
+	if(groupname && groupname.trim() !== ''){
+		if(!management.hasUser(groupname)){
+			management.addUser(groupname);
+			req.session.groupname = groupname;
+			req.session.roomid = roomid;
+			req.session.roompw = roompw;
+			isSuccess = true;
+		} else {
+			// do stuff
+		}
+	}
+	isSuccess = false;
+	if(roomid && roomid.trim() !== ''){
+		if(!management.hasRoom(roomid)){
+			management.addRoom(roomid, roompw, groupname);
+			isSuccess = true;
+		}
+	}
+	
+	res.render('make', {
+		isSuccess : isSuccess
+		, roomid : roomid
+		, roompw : roompw
+		, groupname : groupname
 	});
 });
 
 app.get('/join/:id', function(req,res){
-	var isSuccess = false
-	,	roomname = req.params.id;
+	var	isSuccess = false
+	,	roomid = req.params.id
+	,	groupname = req.session.groupname
 	
-	if(management.hasRoom(roomname)){ 
-		isSuccess = true;
-				
+	if(management.hasRoom(roomid)){
+		var authRoom = management.getRoomPassword(roomid);
+		
+		// 관리자 페이지 접근시 세션이 없는경우!
+		(authRoom == req.session.roompw) ? isSuccess = true : isSuccess = false;
+		
 		res.render('room', {
 			isSuccess : isSuccess
-			, roomname : roomname
-			, username : req.session.username
-			, attendants : management.getAttendantsList(roomname)
+			, roomid : roomid
+			, groupname : groupname
+			, attendants : management.getAttendantsList(roomid)
 		});
 	} else {
-		isSuccess = false;
 		res.render('error', { 
 			errCode : 404,
 			errMsg : '방을 찾지 못하였습니다',
@@ -114,7 +151,38 @@ app.get('/join/:id', function(req,res){
 	}
 });
 
-//app.get('/users', user.list);
+app.post('/join', function(req,res){
+	var isSuccess = false
+	,	roomid = req.body.roomid
+	,	roompw	= req.body.roompw
+	,	groupname = management.getRoomDescribe(req.body.roomid);
+
+	if(roomid && roomid.trim() !== ''){
+		if(management.hasRoom(roomid)){
+			req.session.roomid = roomid;
+			req.session.roompw = roompw;
+			req.session.groupname = groupname;
+			isSuccess = true;
+			console.log(req.session.roompw);
+			res.render('make', {
+				isSuccess : isSuccess
+				, roomid : roomid
+				, roompw : roompw
+				, groupname : groupname
+			});
+
+		}
+	}
+
+});
+
+app.get('/logout', function(req,res){
+	res.render('logout', {
+		roomid : req.session.roomid,
+		groupname : req.session.groupname
+	});
+	req.session.destroy();
+});
 
 server.listen(app.get('port'), function(){
   console.log('Express server listening on port ' + app.get('port'));

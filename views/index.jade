@@ -7,23 +7,23 @@ block content
 				.col-xs-12.col-sm-7
 					h2 A private group game
 					p 우리끼리 하는 게임, 게임이 더 쉬워진다.
-					div(style="margin-top:47%;")
+					div.play-store-link
 						a(href="#", onclick="alert('준비중입니다.')")
 							img(src="https://developer.android.com/images/brand/en_app_rgb_wo_60.png")
 				.col-xs-12.col-sm-5
 					h2 10초만에 방만들기
-					form(action='/enter', method='POST')
-						input.form-control(type='hidden', id='sessionVal', value='#{sessionUsername}')
+					form(action='/make', method='POST')
+						input.form-control(type='hidden', id='sessionVal', value='#{sessionroomid}')
 						.form-group
-							label(for="username") 방 아이디
-							input.form-control(type='text', name='username', id='username', placeholder='아이디를 입력해주세요.')
+							label(for="roomid") 방 아이디 (영문, 숫자조합)
+							input.form-control(type='text', name='roomid', id='roomid', placeholder='사용자들이 참가 할 방 아이디를 입력해주세요.')
+						.form-group
+							label(for="roompw") 방 비밀번호
+							input.form-control(type='password', name='roompw', id='roompw', placeholder='관리 목적의 방 비밀번호를 입력해주세요')
+							small.help-block 방장 전용 비밀번호입니다. 참가자에게 노출을 삼가하세요.	
 						.form-group
 							label(for="groupname") 그룹 이름
-							input.form-control(type='text', name='groupname', id='groupname', placeholder='관리자 그룹 이름을 입력해주세요.')
-						.form-group
-							label(for="grouppw") 그룹 비밀번호
-							input.form-control(type='password', name='grouppw', id='grouppw', placeholder='관리자 비밀번호를 입력해주세요')
-							small.help-block 방장 전용 비밀번호입니다. 참가자에게 노출을 삼가하세요.
+							input.form-control(type='text', name='groupname', id='groupname', placeholder='그룹 이름을 입력해주세요.')
 						input.btn.btn-lg.btn-success(type='submit', value='방 만들기')
 	#about.container
 		.row
@@ -75,11 +75,19 @@ block content
 	script(type='text/javascript').
 		$('document').ready(function(){
 			if($('#sessionVal').val() !== 'undefined'){
-				location.href="/enter";
+				location.href="/join/"+$('#sessionVal').val();
 			}				
 			$('form').submit(function(e){
-				if($.trim($('#username').val()) === ''){
-					alert('닉네임을 입력 해 주세요~!');
+				if($.trim($('#roomid').val()) === ''){
+					alert('방 아이디를 입력 해 주세요~!');
+					return false;
+				}
+				else if($.trim($('#roompw').val()) === ''){
+					alert('방 비밀번호를 입력 해 주세요~!');
+					return false;
+				}
+				else if($.trim($('#groupname').val()) === ''){
+					alert('그룹 이름을 입력 해 주세요~!');
 					return false;
 				}
 			});
