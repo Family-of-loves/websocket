@@ -2,9 +2,9 @@ var management = module.exports = {
 	// 사용자 관리
 	users: []
 	, rooms: []
-		, hasUser: function (username){
+		, hasUser: function (uid){
 			var users = this.users.filter(function(element){
-				return (element === username);
+				return (element === uid);
 			});
 			
 			if( users.length > 0 ){
@@ -13,12 +13,12 @@ var management = module.exports = {
 				return false;
 			}
 		} 
-		, addUser: function (username){
-			this.users.push(username);
+		, addUser: function (uid, username, team, item){
+			this.users.push({uid : uid, name : username, team : team, item : item});
 		}
-		, removeUser: function(username){
+		, removeUser: function(uid){
 			this.users.forEach(function(element, index, attr){
-				if(element === username)
+				if(element === uid)
 					attr.splice(index, 1);
 			});
 		}
@@ -34,7 +34,6 @@ var management = module.exports = {
 			}
 		}
 		, addRoom : function(roomid, roompw, groupname){
-			// 채팅 참가하는 사람들에게 
 			this.rooms.push({id : roomid, password : roompw, desc : groupname, attendants : []})
 		}
 		, removeRoom : function(roomid){
@@ -63,18 +62,17 @@ var management = module.exports = {
 		}
 		*/
 	// 참가자 관리
-		, joinRoom: function(roomid, user){
+		, joinRoom: function(roomid, uid, username, team, item){
 			var rooms = this.rooms.filter(function(element){
 				return (element.id === roomid);
-			});
-			
-			if(!this.hasAttendant(rooms[0].attendants, user)){
-				rooms[0].attendants.push(user);
+			});	
+			if(!this.hasAttendant(rooms[0].attendants, uid)){
+				rooms[0].attendants.push({uid : uid, name : username, team : team, item : item});
 			}
 		}
-		, hasAttendant: function(attendants, user){
+		, hasAttendant: function(attendants, uid){
 			return attendants.some(function(element){
-				return (element === user);
+				return (element === uid);
 			});
 		}
 		, getAttendantsList: function(roomid){
@@ -83,13 +81,12 @@ var management = module.exports = {
 			});
 			return rooms[0].attendants;
 		}
-		, leaveRoom: function(roomid, user){
+		, leaveRoom: function(roomid, uid){
 			var rooms = this.rooms.filter(function(element){
 				return (element.id === roomid);
 			});
-			console.log(rooms);
 			rooms[0].attendants.forEach(function(element, index, attr){
-				if(element === user){
+				if(element.uid === uid){
 					attr.splice(index, 1);
 				}
 			});

@@ -52,13 +52,15 @@ block content
 					p 블루팀
 					ul#blueTeam
 						each attendant in attendants
-							li(id='blue-'+attendant)= attendant
+							- if(attendant.team == 0)
+								li(id='attendant-'+attendant.name)= attendant.name
 			.col-xs-12.col-sm-3.game-teaminfo
 				.inner
 					p 레드팀
 					ul#redTeam
 						each attendant in attendants
-							li(id='red-'+attendant)= attendant
+							- if(attendant.team == 1)
+								li(id='attendant-'+attendant.name)= attendant.name
 	- if(isSuccess)
 		script(type='text/javascript', src='//maps.googleapis.com/maps/api/js?key=AIzaSyB0OkEvPhBQziBq_I8ry-Hs_c2WtF4oRew&sensor=false')
 		script(type='text/javascript').
@@ -100,7 +102,8 @@ block content
 				var messageBox = $('#message');
 				var groupname = $('#groupname').val();
 				var blueTeam = $('#blueTeam');
-				var manager = "관리자"+Math.floor(Math.random() * 100) + 1;;
+				var redTeam = $('#redTeam');
+				var manager = "관리자"+Math.floor(Math.random() * 10) + 1;;
 				
 				function showMsg(msg){
 					activitys.append($('<p>').text(msg));
@@ -113,7 +116,7 @@ block content
 					
 					if($.trim(msg) !== ''){
 						showMsg( manager + ' : ' + msg);
-						room.json.send({username: manager, msg:msg});
+						room.json.send({name: manager, msg:msg});
 						messageBox.val('')	
 					}
 				});
@@ -124,42 +127,36 @@ block content
 				*/
 				
 				room.on('connect', function(){
-					room.emit('join', 
-						{
-							roomid : $('#roomid').val(),
-							username: manager,
-							team: 2
-						}
-					);
+					room.emit('join', {
+							roomid : $('#roomid').val()
+						,	uid: new Date().getTime()
+						,	name: manager
+						,	team: "2"
+						,	item: "3"
+					});
 				});
 				
 				room.on('joined', function(data){
-					if(data.isSuccess){
-						data = data.data;
-						showMsg(data.username + ' 님 입장!');
-						console.log(data);
-						if(data.team == 0){
-							blueTeam.append($('<li>')
-								.attr('id', 'blue-' + data.username)
-								.text(data.username));
-						} else if(data.team == 1){
-							redTeam.append($('<li>')
-								.attr('id', 'red-' + data.username)
-								.text(data.username));							
-						} else {
-							//do stuff your plan
-						}
+					showMsg(data.name + ' 님이 참가하였습니다.');
+					if(data.team == 0){
+						blueTeam.append($('<li>').attr('id', 'attendant-' + data.name).text(data.name));
+					} else if(data.team == 1){
+						redTeam.append($('<li>').attr('id', 'attendant-' + data.name).text(data.name));							
+					} else {
+						//do stuff your plan
 					}
 				});
 				
 				room.on('message', function(data){
 					console.log(data);
-					if(data.isSuccess){
-						data = data.data;
-						showMsg( data.username + ' : ' + data.latitude + ' / ' + data.longitude);
-						add_marker(data.username, data.latitude, data.longitude);
-					}
-					
+					data = data
+					showMsg( data.name + ' : ' + data.latitude + ' / ' + data.longitude);
+					add_marker(data.name, data.latitude, data.longitude);
 				});
-				
+
+				room.on("leaved", function(data){
+					console.log(data.name);
+					showMsg(data.name + "님이 나가셨습니다.");
+					$("#attendant-" + data.name).remove();
+				});
 			});

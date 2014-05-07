@@ -37,22 +37,18 @@ module.exports = function(server){
 	.on('connection', function(socket){
 		var joinedRoom = null;
 		
-		socket.on('join', function(data){			
-			socket.set('username', data.username);
-
+		socket.on('join', function(data){
+			socket.set('uid', data.uid);
+			socket.set('uname', data.name);
 			if( management.hasRoom(data.roomid) ){
 				joinedRoom = data.roomid;
 				
+				// 방참가
 				socket.join(joinedRoom);
-				socket.emit('joined', {
-					isSuccess : true
-				,	data : data
-				});
-				socket.broadcast.to(joinedRoom).emit('joined', {
-					isSuccess : true
-				,	data : data
-				});
-				management.joinRoom(joinedRoom, data.username);
+				// 참가 했다는 이벤트를 연결된 모든 클라이언트에게 전송
+				socket.broadcast.to(joinedRoom).emit('joined' , data);
+				// 방과 관련된 배열에 방 참가자 관리를 위한 메소드
+				management.joinRoom(joinedRoom, data.uid, data.name, data.team, data.item);
 			} else {
 				/* 
 					방이 없는경우 
@@ -61,27 +57,12 @@ module.exports = function(server){
 				*/
 			}
 		});
-		
-		socket.on('joinUser', function(data){
-			var isSuccess = true
-			,	username = data.username;
-			
-			if(username && username.trim() !== ''){
-				if(!management.hasUser(username)){
-					management.addUser(username);
-					isSuccess = true;
-				}
-			}
-				
-		});
-		
 		socket.on('message', function(data){
-			if(joinedRoom){
-				socket.broadcast.to(joinedRoom).emit('message', {isSuccess : true ,data : data});
-			}
+			if(joinedRoom) 
+				socket.broadcast.to(joinedRoom).emit('message', data);
 		});
-
 		socket.on('leave', function(data){
+			console.log(data);
 			if(joinedRoom){
 				management.leaveRoom(joinedRoom, data.username);
 				socket.broadcast.to(joinedRoom).emit('leaved', {username : data.username});
@@ -89,26 +70,26 @@ module.exports = function(server){
 			}
 		});
 		socket.on('disconnect', function(){
-			var disconnUser = null;
-			
-			socket.get('username', function(err,data){
-				disconnUser = data;
+			var uid = null;
+			var uname = null;
+			// 연결시 저장 해 두었던 정보를 연결해지 할 때 불러내기 위하여 사용함.
+			socket.get('uid', function(err,data){
+				uid = data;
 			});
-			
+			socket.get('uname', function(err,data){
+				uname = data;
+			});			
 			if(joinedRoom){
-				management.leaveRoom(joinedRoom, disconnUser);
-				socket.broadcast.to(joinedRoom).emit('leaved', {username : disconnUser});
+				management.leaveRoom(joinedRoom, uid);
+				socket.broadcast.to(joinedRoom).emit('leaved', {name : uname});
 				socket.leave(joinedRoom);
 			}
 		});
+		// 방 폭파
 		socket.on('destroy', function(data){
 			management.removeRoom(data.roomid);
 			management.removeUser(data.groupname);
 			socket.emit('destroySucc', data);
-		});
-		
-		socket.on('tryEstablished', function(data){
-			socket.broadcast.emit("disconnUser", data);
 		});
 	});
 }

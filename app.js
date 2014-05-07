@@ -91,16 +91,19 @@ app.post('/makeroom', function(req, res){
 	});
 });
 */
+// 서버시작시 자동으로 방 생성 (테스트방)
+management.addRoom("test", "test", "test");
 
 app.post('/make', function(req,res){
 	var isSuccess = false
+	,	uid = req.body.uid
 	,	roomid = req.body.roomid
 	,	roompw = req.body.roompw
 	,	groupname = req.body.groupname
 	
 	if(groupname && groupname.trim() !== ''){
 		if(!management.hasUser(groupname)){
-			management.addUser(groupname);
+			management.addUser(uid, groupname, 2, 3);
 			req.session.groupname = groupname;
 			req.session.roomid = roomid;
 			req.session.roompw = roompw;

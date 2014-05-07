@@ -13,7 +13,8 @@ block content
 				.col-xs-12.col-sm-5
 					h2 10초만에 방만들기
 					form(action='/make', method='POST')
-						input.form-control(type='hidden', id='sessionVal', value='#{sessionroomid}')
+						input.form-control(type='hidden', id='sessionVal', value='#{sessionRoomid}')
+						input(type='hidden', name='uid', id='uid', value='#{uid}')
 						.form-group
 							label(for="roomid") 방 아이디 (영문, 숫자조합)
 							input.form-control(type='text', name='roomid', id='roomid', placeholder='사용자들이 참가 할 방 아이디를 입력해주세요.')

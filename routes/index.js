@@ -8,7 +8,7 @@ exports.index = function(req, res){
   
   res.render('index', { 
   	title: 'We are the RunningMan'
-  	, sessionRoomname: req.session.roomname
-  	
+  	, sessionRoomid: req.session.roomid
+  	, uid : new Date().getTime()
   });
 };
