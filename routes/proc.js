@@ -43,12 +43,18 @@ module.exports = function(server){
 			if( management.hasRoom(data.roomid) ){
 				joinedRoom = data.roomid;
 				
+				if(!management.getGameStarted(joinedRoom)){
 				// 방참가
 				socket.join(joinedRoom);
 				// 참가 했다는 이벤트를 연결된 모든 클라이언트에게 전송
 				socket.broadcast.to(joinedRoom).emit('joined' , data);
 				// 방과 관련된 배열에 방 참가자 관리를 위한 메소드
 				management.joinRoom(joinedRoom, data.uid, data.name, data.team, data.item);
+				} else {
+					// HTTP Response 에서 사용되는 Response Code 참조 후 failJoined 말고 failDisconn 이라는 메시지 할당 후 코드번호 구성(다양한 오류에 대해)
+					socket.emit('failJoined', data.uid, {statCode : 600, statMsg : "게임이 진행 중입니다."});
+					socket.disconnect();
+				}
 			} else {
 				/* 
 					방이 없는경우 
@@ -57,12 +63,15 @@ module.exports = function(server){
 				*/
 			}
 		});
+		socket.on('start', function(data){
+			management.setGameStarted(data.roomid);
+			socket.broadcast.to(joinedRoom).emit('message', '게임이 시작 되었습니다.');
+		});
 		socket.on('message', function(data){
 			if(joinedRoom) 
 				socket.broadcast.to(joinedRoom).emit('message', data);
 		});
 		socket.on('leave', function(data){
-			console.log(data);
 			if(joinedRoom){
 				management.leaveRoom(joinedRoom, data.username);
 				socket.broadcast.to(joinedRoom).emit('leaved', {username : data.username});
@@ -81,7 +90,10 @@ module.exports = function(server){
 			});			
 			if(joinedRoom){
 				management.leaveRoom(joinedRoom, uid);
-				socket.broadcast.to(joinedRoom).emit('leaved', {name : uname});
+				
+				if(!management.getGameStarted(joinedRoom))
+					socket.broadcast.to(joinedRoom).emit('leaved', {uid : uid, name : uname});
+					
 				socket.leave(joinedRoom);
 			}
 		});
@@ -93,4 +105,3 @@ module.exports = function(server){
 		});
 	});
 }
-

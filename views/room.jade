@@ -27,9 +27,12 @@ block content
 	- else
 	input#roomid(type="hidden", value="#{roomid}")
 	input#groupname(type="hidden", value="#{groupname}")
-	.container.game-container
+	.game-container
 		.row
 			.col-xs-12.game-mapview
+				.modal-backdrop.fade.in(style="position:absolute;opacity:.7")
+				.modal-inner(style="position:absolute;z-index:1050;left:0;right:0;top:30%;text-align:center")
+					input(type='button',id='gameStart', value='게임시작하기').btn.btn-danger.btn-lg
 				.inner
 					div
 						img.spacer_full(src="/img/spacer_16_9.png")
@@ -47,116 +50,21 @@ block content
 							input(type='text' placeholder="공지사항을 전달하세요.")#message.form-control
 						div.col-xs-3.form-group
 							input(type='submit', value='보내기').btn.btn-success
-			.col-xs-12.col-sm-3.game-teaminfo
+			.col-xs-12.col-sm-3.col-md-3.game-teaminfo
 				.inner
 					p 블루팀
 					ul#blueTeam
 						each attendant in attendants
 							- if(attendant.team == 0)
 								li(id='attendant-'+attendant.name)= attendant.name
-			.col-xs-12.col-sm-3.game-teaminfo
+			.col-xs-12.col-sm-3.col-md-3.game-teaminfo
 				.inner
 					p 레드팀
 					ul#redTeam
 						each attendant in attendants
 							- if(attendant.team == 1)
 								li(id='attendant-'+attendant.name)= attendant.name
+	#participantInfo(style="display:none")
 	- if(isSuccess)
 		script(type='text/javascript', src='//maps.googleapis.com/maps/api/js?key=AIzaSyB0OkEvPhBQziBq_I8ry-Hs_c2WtF4oRew&sensor=false')
-		script(type='text/javascript').
-			var latitude = 0;
-			var longitude = 0;
-			var mapOption = {};
-			var map = {};
-			
-			window.onload = function() {
-				navigator.geolocation.getCurrentPosition(function(position) {
-					latitude = position.coords.latitude;
-					longitude = position.coords.longitude;
-					
-					mapOptions = {
-						center: new google.maps.LatLng(latitude, longitude),
-						zoom: 13,
-						mapTypeId: google.maps.MapTypeId.ROADMAP
-					};
-					
-					map = new google.maps.Map(document.getElementById("map_canvas"),mapOptions);
-				});
-			};
-			function add_marker(playerName,latitude, longitude){
-				var marker = new google.maps.Marker({
-					position: new google.maps.LatLng(latitude, longitude),
-					title: playerName,
-					map : map,
-					clickable: true,
-					flat: true
-				});
-				marker.setMap(map);
-			}
-			
-			setTimeout("add_marker(35.856496, 128.553281)", 3000);
-			
-			$('document').ready(function(){
-				var room = io.connect('/');
-				var activitys = $('#activitys');
-				var messageBox = $('#message');
-				var groupname = $('#groupname').val();
-				var blueTeam = $('#blueTeam');
-				var redTeam = $('#redTeam');
-				var manager = "관리자"+Math.floor(Math.random() * 10) + 1;;
-				
-				function showMsg(msg){
-					activitys.append($('<p>').text(msg));
-					activitys.scrollTop(activitys.height());
-				}
-				
-				$('#notifySender').submit(function(e){
-					e.preventDefault();
-					var msg = messageBox.val();
-					
-					if($.trim(msg) !== ''){
-						showMsg( manager + ' : ' + msg);
-						room.json.send({name: manager, msg:msg});
-						messageBox.val('')	
-					}
-				});
-				
-				
-				/*
-					Socket Method define
-				*/
-				
-				room.on('connect', function(){
-					room.emit('join', {
-							roomid : $('#roomid').val()
-						,	uid: new Date().getTime()
-						,	name: manager
-						,	team: "2"
-						,	item: "3"
-					});
-				});
-				
-				room.on('joined', function(data){
-					showMsg(data.name + ' 님이 참가하였습니다.');
-					if(data.team == 0){
-						blueTeam.append($('<li>').attr('id', 'attendant-' + data.name).text(data.name));
-					} else if(data.team == 1){
-						redTeam.append($('<li>').attr('id', 'attendant-' + data.name).text(data.name));							
-					} else {
-						//do stuff your plan
-					}
-				});
-				
-				room.on('message', function(data){
-					console.log(data);
-					data = data
-					showMsg( data.name + ' : ' + data.latitude + ' / ' + data.longitude);
-					add_marker(data.name, data.latitude, data.longitude);
-				});
-
-				room.on("leaved", function(data){
-					console.log(data.name);
-					showMsg(data.name + "님이 나가셨습니다.");
-					$("#attendant-" + data.name).remove();
-				});
-			});
+		script(type='text/javascript', src='/js/proc.js')

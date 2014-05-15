@@ -33,14 +33,26 @@ var management = module.exports = {
 				return false;
 			}
 		}
-		, addRoom : function(roomid, roompw, groupname){
-			this.rooms.push({id : roomid, password : roompw, desc : groupname, attendants : []})
+		, addRoom : function(roomid, roompw, groupname, isStart){
+			this.rooms.push({id : roomid, password : roompw, desc : groupname, isStarted : false, attendants : []})
 		}
 		, removeRoom : function(roomid){
 			this.rooms.forEach(function(element, index, attr){
 				if(element.id === roomid)
 					attr.splice(index, 1);
 			});
+		}
+		, setGameStarted : function(roomid){
+			var rooms = this.rooms.filter(function(element){
+				return (element.id === roomid);
+			});
+			rooms[0].isStarted = true;
+		}
+		, getGameStarted : function(roomid){
+			var rooms = this.rooms.filter(function(element){
+				return (element.id === roomid);
+			});
+			return rooms[0].isStarted;
 		}
 		, getRoomDescribe : function(roomid){
 			var rooms = this.rooms.filter(function(element){

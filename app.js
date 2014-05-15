@@ -41,56 +41,6 @@ if ('development' == app.get('env')) {
 }
 
 app.get('/', routes.index);
-/*
-app.post('/enter', function(req, res){
-	var isSuccess = false
-		, username = req.body.username;
-		
-	if(username && username.trim() !== ''){
-		if(!management.hasUser(username)){
-			management.addUser(username);
-			req.session.username = username;
-			isSuccess = true;
-		}
-	}
-	res.render('enter', {
-		isSuccess : isSuccess
-		, username : username
-		, roomlist : management.getRoomList()
-	});
-});
-
-app.get('/enter', function(req, res){
-	if(req.session.username){
-		res.render( 'enter' , {
-			isSuccess: true
-			, username: req.session.username
-			, roomlist: management.getRoomList()
-		});
-	} else {
-		res.render( 'enter', {
-			isSuccess: false
-			, username : ''
-		});
-	}
-});
-
-app.post('/makeroom', function(req, res){
-	var isSuccess = false
-		, roomid = req.body.roomid;
-		
-	if(roomid && roomid.trim() !== ''){
-		if(!management.hasRoom(roomid)){
-			management.addRoom(roomid);
-			isSuccess = true;
-		}
-	}
-	res.render('makeroom', {
-		isSuccess : isSuccess
-		, roomid : roomid
-	});
-});
-*/
 // 서버시작시 자동으로 방 생성 (테스트방)
 management.addRoom("test", "test", "test");
 
@@ -187,7 +137,5 @@ app.get('/logout', function(req,res){
 	req.session.destroy();
 });
 
-server.listen(app.get('port'), function(){
-  console.log('Express server listening on port ' + app.get('port'));
-});
+server.listen(app.get('port'), function(){});
 require('./routes/proc')(server);
