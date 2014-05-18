@@ -30,9 +30,11 @@ block content
 	.game-container
 		.row
 			.col-xs-12.game-mapview
-				.modal-backdrop.fade.in(style="position:absolute;opacity:.7")
-				.modal-inner(style="position:absolute;z-index:1050;left:0;right:0;top:30%;text-align:center")
+				
+				.modal-backdrop.fade(style="display:none;position:absolute;opacity:.7")
+				.modal-inner(style="display:none;position:absolute;z-index:1050;left:0;right:0;top:30%;text-align:center")
 					input(type='button',id='gameStart', value='게임시작하기').btn.btn-danger.btn-lg
+				
 				.inner
 					div
 						img.spacer_full(src="/img/spacer_16_9.png")
