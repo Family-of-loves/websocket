@@ -33,7 +33,7 @@ block content
 				
 				.modal-backdrop.fade(style="display:none;position:absolute;opacity:.7")
 				.modal-inner(style="display:none;position:absolute;z-index:1050;left:0;right:0;top:30%;text-align:center")
-					input(type='button',id='gameStart', value='게임시작하기').btn.btn-danger.btn-lg
+					input(type='button',id='gameStart', value='게임시작').btn.btn-danger.btn-lg
 				
 				.inner
 					div
@@ -47,6 +47,7 @@ block content
 			.col-xs-12.col-sm-6.game-activity
 				.inner
 					#activitys.activity-window
+						p(style='text-align:center') 환영합니다.<br /> 모든 참가자가 들어왔다면 "게임시작"버튼을 눌러주세요.
 					form#notifySender.row.activity-form
 						div.col-xs-9.form-group
 							input(type='text' placeholder="공지사항을 전달하세요.")#message.form-control

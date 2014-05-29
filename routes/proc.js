@@ -52,10 +52,12 @@ module.exports = function(server){
 				management.joinRoom(joinedRoom, data.uid, data.name, data.team, data.item);
 				} else {
 					// HTTP Response 에서 사용되는 Response Code 참조 후 failJoined 말고 failDisconn 이라는 메시지 할당 후 코드번호 구성(다양한 오류에 대해)
-					socket.emit('failJoined', data.uid, {statCode : 600, statMsg : "게임이 진행 중입니다."});
+					socket.emit('failDisconn', data.uid, {statCode : 600, statMsg : "게임이 진행 중입니다."});
 					socket.disconnect();
 				}
 			} else {
+				socket.emit('failDisconn', data.uid, {statCode : 403, statMsg : "게임이 존재하지 않습니다."});
+				socket.disconnect();
 				/* 
 					방이 없는경우 
 					(서버가 재시작된다면 이 방은 없어져야함)
@@ -70,6 +72,14 @@ module.exports = function(server){
 		socket.on('message', function(data){
 			if(joinedRoom) 
 				socket.broadcast.to(joinedRoom).emit('message', data);
+		});
+		socket.on('minigame', function(data){
+			if(joinedRoom)
+				socket.broadcast.to(joinedRoom).emit('minigame', data);
+		});
+		socket.on('resMinigame', function(data){
+			if(joinedRoom)
+				socket.broadcast.to(joinedRoom).emit('resMinigame', data);
 		});
 		socket.on('leave', function(data){
 			if(joinedRoom){

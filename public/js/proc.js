@@ -70,6 +70,7 @@ $('document').ready(function(){
 				"data-longitude" : data.longitude
 			});
 		}
+		showMessage(data.name + " : " + data.msg);
 		readMarkers();
 	});
 
