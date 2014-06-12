@@ -13,7 +13,10 @@ html
 
     header#main-header.navbar.navbar-static-top
       .container
-        h1.navbar-brand We are the RunningMan
+        h1.navbar-brand 
+          a(href="/")
+            img(src="/img/logo_web.png" style="max-width:100%;")
+            span &nbsp;We are the RunningMan
         div.pull-right.top-nav
           - if(groupname)
             .dropdown
@@ -25,7 +28,7 @@ html
                 span.caret
               ul.dropdown-menu(role="menu")
                 li
-                  a(href="/logout") Logout
+                  a(href="/logout") 방 폭파
           - else 
             nav.collapse.navbar-collapse(role="navigation")
               ul.nav.navbar-nav.navbar-right

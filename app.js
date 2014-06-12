@@ -80,6 +80,7 @@ app.post('/make', function(req,res){
 
 app.get('/join/:id', function(req,res){
 	var	isSuccess = false
+	,	isStarted = false
 	,	roomid = req.params.id
 	,	groupname = req.session.groupname
 	
@@ -94,6 +95,7 @@ app.get('/join/:id', function(req,res){
 			, roomid : roomid
 			, groupname : groupname
 			, attendants : management.getAttendantsList(roomid)
+			, isStarted : management.getGameStarted(roomid)
 		});
 	} else {
 		res.render('error', { 

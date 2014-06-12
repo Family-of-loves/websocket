@@ -24,7 +24,7 @@ $('document').ready(function(){
 		
 		if($.trim(msg) !== ''){
 			showMessage( manager + ' : ' + msg);
-			room.json.send({name: manager, msg:msg});
+			room.json.send({name: manager, msg:msg, team: 2});
 			messageBox.val('')	
 		}
 	});
@@ -63,14 +63,15 @@ $('document').ready(function(){
 	
 	room.on('message', function(data){
 		if ( $("#participantInfo > #"+data.uid+"").length === 0 ) {
-			$("#participantInfo").append("<input type='hidden' id="+data.uid+" data-name="+data.name+" data-latitude="+data.latitude+" data-longitude="+data.longitude+">");
+			$("#participantInfo").append("<input type='hidden' id="+data.uid+" data-name="+data.name+" data-team="+data.team+" data-latitude="+data.latitude+" data-longitude="+data.longitude+">");
 		} else {
 			$("#"+data.uid).attr({
 				"data-latitude" : data.latitude,
 				"data-longitude" : data.longitude
 			});
 		}
-		showMessage(data.name + " : " + data.msg);
+		if(data.team == 2)
+			showMessage(data.name + " : " + data.msg);
 		readMarkers();
 	});
 
@@ -78,6 +79,7 @@ $('document').ready(function(){
 		showMessage(data.name + "님이 나가셨습니다.");
 		$("#attendant-" + data.name).remove();
 		$("#"+data.uid).remove();
+		readMarkers();
 	});
 });
 			
@@ -116,8 +118,8 @@ window.onload = function() {
 		}
 	};
 })();
-function createMarker(name, latlng) {
-	var marker = new google.maps.Marker({position: latlng, map: map});
+function createMarker(name, latlng, team) {
+	var marker = new google.maps.Marker({position: latlng, map: map, icon:'../img/marker_'+team+'_web.png'});
 	google.maps.event.addListener(marker, "click", function() {
 		if (infowindow) infowindow.close();
 			infowindow = new google.maps.InfoWindow({content: name});
@@ -129,7 +131,7 @@ function readMarkers(){
 	deleteMarkers();
 	$("#participantInfo > input").each(function(index, value){
 		var loc = new google.maps.LatLng($(this).attr("data-latitude"), $(this).attr("data-longitude"));
-		map.addMarker(createMarker($(this).attr("data-name"),loc));
+		map.addMarker(createMarker($(this).attr("data-name"),loc,$(this).attr("data-team")));
 	});
 }
 function deleteMarkers() {

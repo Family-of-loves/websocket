@@ -12,9 +12,10 @@ small {color:inherit}
 	Inherit Bootstrap Classes
 */
 .container, .game-container{max-width:940px; margin:0 auto;}
-.navbar-brand{ margin:0; border-bottom:#e0e0e0; }
+.navbar-brand{ margin:0; border-bottom:#e0e0e0; height:auto }
 .navbar .container h1,
 .navbar .container .top-user-info {padding:15px 0; line-height:20px;}
+.navbar .container h1 {padding:8px 0;}
 .navbar .container .pull-right.top-nav {padding:8px 0;}
 .row [class^="col-"].border-bottom {margin-bottom:22px;}
 .help-block{color:inherit}
@@ -55,7 +56,8 @@ small {color:inherit}
 @media all and (max-width:767px){
 	[data-is-mobile="false"] {display:none;}
 	#main-header.navbar{margin-bottom:0;}
-	#main-header .navbar-brand{text-align: center;}
+	#main-header .navbar-brand{float:none;text-align: center;}
+	.navbar .container h1 span{display:none}
 	.masthead{padding:0 0 20px;}
 	.play-store-link{margin-top:10px; margin-bottom:20px}
 	

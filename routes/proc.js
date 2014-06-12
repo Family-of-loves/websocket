@@ -15,22 +15,7 @@ module.exports = function(server){
 			, 'htmlfile'
 			, 'xhr-polling'
 			, 'jsonp-polling'
-		]);
-		/*io.set('authorization', function (handshakeData, accept) {
-			if (handshakeData.headers.cookie) {		
-			
-				handshakeData.cookie = cookie.parse(handshakeData.headers.cookie);
-				handshakeData.sessionID = connect.utils.parseSignedCookie(handshakeData.cookie['express.sid'], 'secret');
-			
-				if (handshakeData.cookie['express.sid'] == handshakeData.sessionID) {
-					return accept('Cookie is invalid.', false);
-				}
-			} else {
-				return accept('No cookie transmitted.', false);
-			} 
-			accept(null, true);
-		});*/
-		
+		]);		
 	});
 	
 	var room = io
@@ -42,32 +27,32 @@ module.exports = function(server){
 			socket.set('uname', data.name);
 			if( management.hasRoom(data.roomid) ){
 				joinedRoom = data.roomid;
-				
 				if(!management.getGameStarted(joinedRoom)){
-				// 방참가
-				socket.join(joinedRoom);
-				// 참가 했다는 이벤트를 연결된 모든 클라이언트에게 전송
-				socket.broadcast.to(joinedRoom).emit('joined' , data);
-				// 방과 관련된 배열에 방 참가자 관리를 위한 메소드
-				management.joinRoom(joinedRoom, data.uid, data.name, data.team, data.item);
-				} else {
-					// HTTP Response 에서 사용되는 Response Code 참조 후 failJoined 말고 failDisconn 이라는 메시지 할당 후 코드번호 구성(다양한 오류에 대해)
-					socket.emit('failDisconn', data.uid, {statCode : 600, statMsg : "게임이 진행 중입니다."});
-					socket.disconnect();
+					// 방참가
+					socket.join(joinedRoom);
+					// 참가 했다는 이벤트를 연결된 모든 클라이언트에게 전송
+					socket.broadcast.to(joinedRoom).emit('joined' , data);
+					// 방과 관련된 배열에 방 참가자 관리를 위한 메소드
+					management.joinRoom(joinedRoom, data.uid, data.name, data.team, data.item);
 				}
-			} else {
-				socket.emit('failDisconn', data.uid, {statCode : 403, statMsg : "게임이 존재하지 않습니다."});
-				socket.disconnect();
-				/* 
-					방이 없는경우 
-					(서버가 재시작된다면 이 방은 없어져야함)
-					이때 Private 통신을 통하여 로그아웃 시킴.
-				*/
 			}
 		});
 		socket.on('start', function(data){
 			management.setGameStarted(data.roomid);
-			socket.broadcast.to(joinedRoom).emit('message', '게임이 시작 되었습니다.');
+			socket.broadcast.to(joinedRoom).emit('gameStart', data);
+		});
+		socket.on('chkRoom', function(data){
+			if(management.hasRoom(data.roomid)){
+				if(management.getGameStarted(data.roomid)){
+					socket.emit('established', data.uid, {statCode : 600, statMsg : "게임이 진행 중입니다."});
+					//socket.disconnect();
+				} else {				
+					socket.emit('established', data.uid, {statCode : 200, statMsg : "참가 성공"});
+				}
+			} else {
+				socket.emit('established', data.uid, {statCode : 403, statMsg : "게임이 존재하지 않습니다."});
+//				socket.disconnect();
+			}
 		});
 		socket.on('message', function(data){
 			if(joinedRoom) 
@@ -83,15 +68,15 @@ module.exports = function(server){
 		});
 		socket.on('leave', function(data){
 			if(joinedRoom){
-				management.leaveRoom(joinedRoom, data.username);
-				socket.broadcast.to(joinedRoom).emit('leaved', {username : data.username});
+				management.leaveRoom(joinedRoom, data.name);
+				socket.broadcast.to(joinedRoom).emit('leaved', data);
 				socket.leave(joinedRoom);
 			}
 		});
 		socket.on('disconnect', function(){
 			var uid = null;
 			var uname = null;
-			// 연결시 저장 해 두었던 정보를 연결해지 할 때 불러내기 위하여 사용함.
+			
 			socket.get('uid', function(err,data){
 				uid = data;
 			});
