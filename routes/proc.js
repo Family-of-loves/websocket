@@ -28,12 +28,15 @@ module.exports = function(server){
 			if( management.hasRoom(data.roomid) ){
 				joinedRoom = data.roomid;
 				if(!management.getGameStarted(joinedRoom)){
-					// 방참가
 					socket.join(joinedRoom);
-					// 참가 했다는 이벤트를 연결된 모든 클라이언트에게 전송
 					socket.broadcast.to(joinedRoom).emit('joined' , data);
-					// 방과 관련된 배열에 방 참가자 관리를 위한 메소드
 					management.joinRoom(joinedRoom, data.uid, data.name, data.team, data.item);
+				} else {
+					if(data.team == 2){
+						socket.join(joinedRoom);
+						socket.broadcast.to(joinedRoom).emit('joined' , data);
+						management.joinRoom(joinedRoom, data.uid, data.name, data.team, data.item);
+					}
 				}
 			}
 		});

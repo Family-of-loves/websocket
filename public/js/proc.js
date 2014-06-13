@@ -62,6 +62,7 @@ $('document').ready(function(){
 	});
 	
 	room.on('message', function(data){
+		console.log(data);
 		if ( $("#participantInfo > #"+data.uid+"").length === 0 ) {
 			$("#participantInfo").append("<input type='hidden' id="+data.uid+" data-name="+data.name+" data-team="+data.team+" data-latitude="+data.latitude+" data-longitude="+data.longitude+">");
 		} else {
@@ -72,7 +73,7 @@ $('document').ready(function(){
 		}
 		if(data.team == 2)
 			showMessage(data.name + " : " + data.msg);
-		readMarkers();
+			readMarkers();
 	});
 
 	room.on("leaved", function(data){
