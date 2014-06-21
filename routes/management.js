@@ -34,7 +34,13 @@ var management = module.exports = {
 			}
 		}
 		, addRoom : function(roomid, roompw, groupname, isStart){
-			this.rooms.push({id : roomid, password : roompw, desc : groupname, isStarted : false, attendants : []})
+			this.rooms.push({
+					id : roomid, 
+					password : roompw, 
+					desc : groupname, 
+					isStarted : false, 
+					attendants : []
+				})
 		}
 		, removeRoom : function(roomid){
 			this.rooms.forEach(function(element, index, attr){
@@ -66,13 +72,13 @@ var management = module.exports = {
 			});
 			return rooms[0].password;
 		}
-		/*
+		
 		, getRoomList : function(){
 			return this.rooms.map( function(element){
-				return element.desc;
+				return {'roomid' : element.id, 'groupname':element.desc, 'attendants':element.attendants};
 			});
 		}
-		*/
+		
 	// 참가자 관리
 		, joinRoom: function(roomid, uid, username, team, item){
 			var rooms = this.rooms.filter(function(element){

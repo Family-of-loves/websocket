@@ -14,6 +14,7 @@ block content
 					h2 10초만에 방만들기
 					form(action='/make', method='POST')
 						input.form-control(type='hidden', id='sessionVal', value='#{sessionRoomid}')
+						input(type='hidden', name='isRestful', id='isRestful', value='0')
 						input(type='hidden', name='uid', id='uid', value='#{uid}')
 						.form-group
 							label(for="roomid") 방 아이디 (영문, 숫자조합)

@@ -50,6 +50,7 @@ app.post('/make', function(req,res){
 	,	roomid = req.body.roomid
 	,	roompw = req.body.roompw
 	,	groupname = req.body.groupname
+	,	isRestful = req.body.isRestful;
 	
 	if(groupname && groupname.trim() !== ''){
 		if(!management.hasUser(groupname)){
@@ -69,13 +70,23 @@ app.post('/make', function(req,res){
 			isSuccess = true;
 		}
 	}
-	
-	res.render('make', {
-		isSuccess : isSuccess
-		, roomid : roomid
-		, roompw : roompw
-		, groupname : groupname
-	});
+
+	if(isRestful == '0'){	
+		res.render('make', {
+			isSuccess : isSuccess
+			, roomid : roomid
+			, roompw : roompw
+			, groupname : groupname
+		});
+	} else {
+		res.send({
+			"response": isSuccess
+			, roomid : roomid
+			, roompw : roompw
+			, groupname : groupname
+
+		});
+	}
 });
 
 app.get('/join/:id', function(req,res){
@@ -128,14 +139,23 @@ app.post('/join', function(req,res){
 
 		}
 	}
+});
 
+app.get('/list', function(req,res){
+	res.send(management.getRoomList());
 });
 
 app.get('/logout', function(req,res){
-	res.render('logout', {
-		roomid : req.session.roomid,
-		groupname : req.session.groupname
-	});
+	
+	
+	if(typeof req.session.roomid == 'undefined'){
+		res.send({"response" : "false"});
+	} else {
+		res.render('logout', {
+			roomid : req.session.roomid,
+			groupname : req.session.groupname
+		});
+	}
 	req.session.destroy();
 });
 

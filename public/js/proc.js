@@ -15,7 +15,7 @@ $('document').ready(function(){
 	
 	function showMessage(msg){
 		activitys.append($('<p>').text(msg));
-		activitys.scrollTop(activitys[0].scrollHheight);
+		activitys.scrollTop(activitys[0].scrollHeight);
 	}
 	
 	$('#notifySender').submit(function(e){
